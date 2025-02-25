@@ -1,0 +1,102 @@
+---
+title: 'Class 5: Data visualization with ggplot2'
+author: "Ellice Wang"
+date: "2025-01-15"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Class 5: Data visualization with ggplot2
+
+Q1: For which phases is data visualization important in our scientific workflows?\
+\> all of the above \
+Q2: True or False? The ggplot2 package comes already installed with R?\
+\> FALSE
+
+
+```{r intro to scatterplots}
+#Load in ggplot2
+library(ggplot2)
+
+# plot speed and stopping distance of car dataset
+ggplot(cars) + aes(x=speed, y=dist) + geom_point() + geom_smooth(method=lm,
+                                                                 se=FALSE) + 
+  labs(title="Speed and Stopping Distance of Cars", x="Speed (MPH)",
+       y="Stopping Distance (ft)") + theme_bw()
+```
+
+```{r adding more plot aesthetics}
+
+# load in dataframe from url
+url <- "https://bioboot.github.io/bimm143_S20/class-material/up_down_expression.txt"
+genes <- read.delim(url)
+table(genes$State)
+# already knew there were 127 up regulated genes based on prev code
+127/5196
+# more universal solution to find frequency of all genes
+round(table(genes$State)/nrow(genes) * 100, 2)
+
+p <- ggplot(genes) + aes(x=Condition1, y=Condition2, col=State) + geom_point() +
+  labs(title="Gene Expression Changes Upon Drug Treatment", x="Control (no drug)",
+         y="Drug Treatment")
+p + scale_colour_manual(values=c("blue", "gray", "red"))
+
+```
+
+## 7. Going Further
+
+```{r gapminder}
+# load in dataset from url
+url <- "https://raw.githubusercontent.com/jennybc/gapminder/master/inst/extdata/gapminder.tsv"
+gapminder <- read.delim(url)
+
+# load in dplyr package
+library(dplyr)
+
+gapminder_2007 <- gapminder %>% filter(year==2007)
+ggplot(gapminder_2007) + aes(x=gdpPercap, y=lifeExp, color=continent,
+                             size=pop) + geom_point(alpha=0.5) + 
+  labs(title="Life Expectancy and GDP per Capita for 142 countries (2007)") +
+  scale_size_area(max_size=10)
+
+gapminder_1957 <- gapminder %>% filter(year==1957)
+ggplot(gapminder_1957) + aes(x=gdpPercap, y=lifeExp, color=continent, size=pop)+
+  geom_point(alpha=0.7) + scale_size_area(max_size = 15) + labs(title="1957")
+
+gapminder_combo <- gapminder %>% filter(year == 1957 | year == 2007)
+ggplot(gapminder_combo) + aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.5) + scale_size_area(max_size = 15) + facet_wrap(~year)
+
+```
+
+```{r bar charts}
+
+gapminder_top5 <- gapminder %>% filter(year==2007) %>% arrange(desc(pop)) %>%
+  top_n(5, pop)
+
+gapminder_top5
+
+ggplot(gapminder_top5 ) + geom_col(aes(x=reorder(country,-pop), y=pop, 
+                                       fill=gdpPercap))
+ggplot(gapminder_top5) + geom_col(aes(x=country, y=lifeExp))
+
+```
+
+```{r bar plots dataset: US arrests}
+
+head(USArrests)
+USArrests$State <- rownames(USArrests)
+ggplot(USArrests) + aes(x=reorder(State, Murder), y=Murder) +
+  geom_point() + geom_segment(aes(x=State, xend=State, y=0, yend=Murder), 
+                              color="blue") + coord_flip()
+
+```
+
+```{r}
+sessionInfo()
+```

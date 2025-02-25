@@ -1,0 +1,188 @@
+---
+title: "Class 5: Data Visualization with ggplot"
+author: "Ellice Wang (PID: A16882742)"
+format: pdf
+---
+
+## Intro to ggplot
+
+There are many graphics systems in R (ways to make plots + figures). These include "base" R plots. Today we will focus mostly on the **ggplot2** package.
+
+Let's start with a plot of a simple in-built dataset called 'cars'.
+
+```{r}
+cars
+```
+
+```{r}
+plot(cars)
+```
+
+Making this figure using **ggplot**. First need to install this package on my computer. To install any R package, I use function 'install.packages(<name_of_package>)'
+
+> I will run 'install.packages("ggplot2") in R console instead of this quarto document
+
+Before I can use any functions from add on packages I need to load the package from my "library()" with the 'library(ggplot2)' call
+
+```{r}
+# load in ggplot
+library(ggplot2)
+```
+
+All ggplot figures have ≥ 3 things (called layers). These include:
+
+-   **data** (input datset I want to plot from)
+-   **aes** (the aesthetic mapping of the data to my plot)
+-   **geoms** (the geom_point(), geom_line(), etc. that I want to draw)
+
+```{r}
+ggplot(cars) + 
+  aes(x=speed, y=dist) + 
+  geom_point()
+```
+
+Let's add a line to show the relationship here:
+
+```{r}
+ggplot(cars) + 
+  aes(x=speed, y=dist) + 
+  geom_point() + 
+  geom_smooth(method="lm") + 
+  theme_bw() +
+  labs(title="Speed and Stopping Distance of Cars", x="speed (MPH)", y="distance (ft)")
+```
+
+> Q1: For which phases is data visualization important in our scientific workflows? Communication of results, exploratory data analysis, and detection of outliars
+
+> Q2: True or False? The ggplot2 package comes already installed with R? FALSE
+
+> Q3: Which plot types are typically NOT used to compare distributions of numeric variables? Network graphs
+
+> Q4: Which statement about data visualization with ggplot2 is incorrect? ggplot2 is the only way to create plots in R
+
+> Q5. Which geometric layer should be used to create scatter plots in ggplot2? geom_point()
+
+## Genes dataset
+
+```{r}
+url <- "https://bioboot.github.io/bimm143_S20/class-material/up_down_expression.txt"
+genes <- read.delim(url)
+head(genes)
+```
+
+> How many genes are in this dataset? 
+5196 genes
+
+> Use the colnames() function and the ncol() function on the genes data frame to find out what the column names are (we will need these later) and how many columns there are. How many columns did you find? 
+4 columns
+
+> Use the table() function on the State column of this data.frame to find out how many ‘up’ regulated genes there are. What is your answer? 
+127 up regulated genes
+
+> Using your values above and 2 significant figures. What fraction of total genes is up-regulated in this dataset? 
+2.44
+
+```{r}
+n.tot <- nrow(genes)
+colnames(genes)
+vals <- table(genes$State)
+round(table(genes$State)/nrow(genes) * 100, 2)
+
+round(vals/n.tot*100, 2)
+```
+
+A first plot of this dataset:
+
+```{r}
+ggplot(genes) + 
+  aes(x=Condition1, y=Condition2, col=State) + 
+  geom_point() +
+  labs(title="Gene Expression Changes Upon Drug Treatment", x="Control (no drug)",
+       y="Drug Treatment") +
+  scale_color_manual(values=c("blue", "grey", "red"))
+
+```
+
+## Gapminder dataset
+
+> I will run 'install.packages("dplyr") in R console instead of this quarto document
+
+
+```{r}
+# load in dataset from url
+url <- "https://raw.githubusercontent.com/jennybc/gapminder/master/inst/extdata/gapminder.tsv"
+gapminder <- read.delim(url)
+
+# load in dplyr package
+library(dplyr)
+```
+
+plot Gapminder dataset from 2007 based on GDP per capita and life expectancy
+
+```{r}
+gapminder_2007 <- gapminder %>% filter(year==2007)
+ggplot(gapminder_2007) + 
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) + 
+  geom_point(alpha=0.5) + 
+  labs(title="Life Expectancy and GDP per Capita for 142 countries (2007)") +
+  scale_size_area(max_size=10)
+
+gapminder_1957 <- gapminder %>% filter(year==1957)
+ggplot(gapminder_1957) + 
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.7) + 
+  scale_size_area(max_size = 15) + 
+  labs(title="Life Expectancy and GDP per Capita for 142 countries (1957)")
+
+gapminder_combo <- gapminder %>% filter(year == 1957 | year == 2007)
+ggplot(gapminder_combo) + 
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.5) + 
+  scale_size_area(max_size = 10) + 
+  facet_wrap(~year)
+
+```
+
+## Bar charts
+
+```{r}
+
+gapminder_top5 <- gapminder %>% filter(year==2007) %>% arrange(desc(pop)) %>%
+  top_n(5, pop)
+
+gapminder_top5
+
+ggplot(gapminder_top5 ) + geom_col(aes(x=reorder(country,-pop), y=pop, 
+                                       fill=gdpPercap))
+ggplot(gapminder_top5) + geom_col(aes(x=country, y=lifeExp))
+
+```
+
+```{r bar plots dataset: US arrests}
+
+head(USArrests)
+USArrests$State <- rownames(USArrests)
+ggplot(USArrests) + aes(x=reorder(State, Murder), y=Murder) +
+  geom_point() + geom_segment(aes(x=State, xend=State, y=0, yend=Murder), 
+                              color="blue") + coord_flip()
+
+```
+
+```{r}
+library(patchwork)
+
+# Setup some example plots 
+p1 <- ggplot(mtcars) + geom_point(aes(mpg, disp))
+p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
+p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
+p4 <- ggplot(mtcars) + geom_bar(aes(carb))
+
+# Use patchwork to combine them here:
+(p1 | p2 | p3) /
+      p4
+```
+
+
+```{r}
+sessionInfo()
+```

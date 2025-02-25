@@ -1,0 +1,16 @@
+Version: 1.0
+ProjectId: 7b9500be-f2aa-47af-b082-9c8d524831e6
+
+RestoreWorkspace: No
+SaveWorkspace: No
+AlwaysSaveHistory: Default
+
+EnableCodeIndexing: Yes
+UseSpacesForTab: Yes
+NumSpacesForTab: 2
+Encoding: UTF-8
+
+RnwWeave: Sweave
+LaTeX: pdfLaTeX
+
+ProjectName: wi25_bimm143_bioinformatics_lab
