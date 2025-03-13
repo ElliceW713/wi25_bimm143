@@ -3,7 +3,7 @@ title: "AlphaFold Analysis"
 author: "Ellice Wang (PID: A16882742)"
 date: February 11, 2025
 toc: True
-format: pdf
+format: html
 ---
 
 Here we analyze our AlphaFold structure prediction models. The input direcotry/folder comers from the ColabFold server:
