@@ -1,4 +1,4 @@
-#theme: jekyll-theme-minimal
-remote_theme: jekflix
+theme: jekyll-theme-minimal
+#remote_theme: jekflix
 logo: https://www.rosalind.bio/hubfs/BioInformatics%20Data%20Large.jpg
 title: Bioinformatics class
