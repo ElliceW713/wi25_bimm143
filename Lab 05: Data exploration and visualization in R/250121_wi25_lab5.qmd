@@ -1,7 +1,7 @@
 ---
 title: "Class 5: Data Visualization with ggplot"
 author: "Ellice Wang (PID: A16882742)"
-format: pdf
+format: html
 ---
 
 ## Intro to ggplot
